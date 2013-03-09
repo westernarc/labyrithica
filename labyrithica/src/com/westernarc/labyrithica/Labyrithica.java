@@ -12,7 +12,11 @@ public class Labyrithica implements ApplicationListener {
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	
-	private Sprite[] sprWall;
+	private Sprite[] sprArrFloorTiles;
+	
+	//Dimensions of screen
+	int SCREEN_WIDTH;
+	int SCREEN_HEIGHT;
 	
 	//Width and height in number of tiles of each labyrinth floor
 	final int CONST_LABYRINTH_WIDTH = 32;
@@ -35,16 +39,16 @@ public class Labyrithica implements ApplicationListener {
 	
 	@Override
 	public void create() {		
-		float w = Gdx.graphics.getWidth();
-		float h = Gdx.graphics.getHeight();
+		SCREEN_WIDTH = Gdx.graphics.getWidth();
+		SCREEN_HEIGHT = Gdx.graphics.getHeight();
 		
-		camera = new OrthographicCamera(w, h);
+		camera = new OrthographicCamera(SCREEN_WIDTH, SCREEN_HEIGHT);
 		batch = new SpriteBatch();
 		
-		sprWall = new Sprite[CONST_LABYRINTH_WIDTH * CONST_LABYRINTH_HEIGHT];
-		for(int i = 0; i < sprWall.length; i++) {
-			sprWall[i] = new Sprite(new Texture(Gdx.files.internal("img/wall.png")));
-		}
+		sprArrFloorTiles = new Sprite[16];
+		sprArrFloorTiles[0] = new Sprite(new Texture(Gdx.files.internal("img/wall.png")));
+		sprArrFloorTiles[1] = new Sprite(new Texture(Gdx.files.internal("img/floor.png")));
+		sprArrFloorTiles[2] = new Sprite(new Texture(Gdx.files.internal("img/stairs.png")));
 		
 		varFloorTiles = new FLOORTILE[CONST_LABYRINTH_WIDTH][CONST_LABYRINTH_HEIGHT];
 		createNewFloor();
@@ -59,7 +63,7 @@ public class Labyrithica implements ApplicationListener {
 
 	@Override
 	public void render() {		
-		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClearColor(0.1f, 0.1f, 0.15f, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		batch.setProjectionMatrix(camera.combined);
@@ -83,11 +87,12 @@ public class Labyrithica implements ApplicationListener {
 				//Draw each tile according to the type of floortype they are
 				switch(varFloorTiles[i][ii]){
 				case Floor:
-						
+					sprArrFloorTiles[1].setPosition(i * CONST_TILE_WIDTH, ii * CONST_TILE_HEIGHT);
+					sprArrFloorTiles[1].draw(batch);	
 					break;
 				case Wall:
-					sprWall[0].setPosition(i * CONST_TILE_WIDTH, ii * CONST_TILE_HEIGHT);
-					sprWall[0].draw(batch);
+					sprArrFloorTiles[0].setPosition(i * CONST_TILE_WIDTH, ii * CONST_TILE_HEIGHT);
+					sprArrFloorTiles[0].draw(batch);
 					break;
 				default:
 					break;
@@ -98,13 +103,16 @@ public class Labyrithica implements ApplicationListener {
 	}
 	
 	private void drawPlayer() {
+		//Player contains location in map coordinates.
+		//Need to translate to screen coordinates.
+		player.sprite.setPosition(player.x * CONST_TILE_WIDTH, player.y * CONST_TILE_HEIGHT);
 		player.sprite.draw(batch);
 	}
 	//Reinitialize the floor array with a new floor
 	private void createNewFloor() {
 		for(int i = 0; i < CONST_LABYRINTH_WIDTH; i++) {
 			for(int ii = 0; ii < CONST_LABYRINTH_HEIGHT; ii++) {
-				if(Math.random() > 0.5) {
+				if(Math.random() > 0.8) {
 					varFloorTiles[i][ii] = FLOORTILE.Wall;
 				} else {
 					varFloorTiles[i][ii] = FLOORTILE.Floor;
@@ -117,13 +125,73 @@ public class Labyrithica implements ApplicationListener {
 		if(Gdx.input.isTouched()) {
 			int x = Gdx.input.getX();
 			int y = Gdx.input.getY();
-			System.out.println(x + "," + y);
-			player.move(100, 100);
+			//Split the screen into 9 squares.
+			//NW, N, NE, W, C, E, SW, S, SE
+			//Split up like this:
+			//1 2 3
+			//4 5 6
+			//7 8 9
+			int pos = 0;
+			//Top row
+			if(y < SCREEN_HEIGHT / 3f) {
+				if(x < SCREEN_WIDTH / 3f) pos = 1;
+				else if(x > SCREEN_WIDTH * 2f / 3f) pos = 3;
+				else pos = 2;
+			}
+			//Bottom row
+			else if(y > SCREEN_HEIGHT * 2f / 3f){
+				if(x < SCREEN_WIDTH / 3f) pos = 7;
+				else if(x > SCREEN_WIDTH * 2f / 3f) pos = 9;
+				else pos = 8;
+			}
+			//Middle row
+			else {
+				if(x < SCREEN_WIDTH / 3f) pos = 4;
+				else if(x > SCREEN_WIDTH * 2f / 3f) pos = 6;
+				else pos = 5;
+			}
+			System.out.println(pos);
+			switch(pos) {
+			case 1: //NW
+				break;
+			case 2: //N
+				if(player.getFloorY() < CONST_LABYRINTH_HEIGHT - 1 && varFloorTiles[player.getFloorX()][player.getCeilY() + 1] == FLOORTILE.Floor)
+				player.moveTo(0, 0.7f);
+				break;
+			case 3: //NE
+				break;
+			case 4: //W
+				if(player.getFloorX() > 0 && varFloorTiles[player.getFloorX() - 1][player.getFloorY()] == FLOORTILE.Floor)
+				player.moveTo(-0.7f, 0);
+				break;
+			case 5: //C
+				break;
+			case 6: //E
+				if(player.getFloorX() < CONST_LABYRINTH_WIDTH - 1 && varFloorTiles[player.getCeilX() + 1][player.getFloorY()] == FLOORTILE.Floor)
+				player.moveTo(0.7f, 0);
+				break;
+			case 7: //SW
+				break;
+			case 8: //S
+				if(player.getFloorY() > 0 && varFloorTiles[player.getFloorX()][player.getFloorY() - 1] == FLOORTILE.Floor)
+				player.moveTo(0, -0.7f);
+				break;
+			case 9: //SE
+				break;
+			default:
+			}
 		}
 	}
 	
 	private void update() {
+		//Update the player
 		player.update();
+		
+		//Move the camera to be in position
+		camera.position.set((int)player.sprite.getX(), (int)player.sprite.getY(), 0);
+		camera.update(true);
+		
+		
 	}
 	@Override
 	public void resize(int width, int height) {

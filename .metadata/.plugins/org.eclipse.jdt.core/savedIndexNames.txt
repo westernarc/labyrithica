@@ -6,7 +6,6 @@ INDEX VERSION 1.126+C:\workspace\labyrithica\.metadata\.plugins\org.eclipse.jdt.
 1537743733.index
 523304455.index
 765042270.index
-1919551164.index
 3766226072.index
 2676193384.index
 1254420933.index

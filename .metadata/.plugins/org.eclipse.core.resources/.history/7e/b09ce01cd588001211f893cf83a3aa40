@@ -1,0 +1,13 @@
+package com.westernarc.labyrithica;
+
+public class Player {
+	//Stats: Strength, Speed, Intelligence
+	//Reduces chance to dodge
+	//Increases physical damage, maximum HP, 
+	public int VIT;
+	//Increases turn order, chance to dodge
+	public int SPD;
+	//Gives higher cast success chance, ability regen,
+	//ability effectiveness, maximum AP
+	public int WIS;
+}

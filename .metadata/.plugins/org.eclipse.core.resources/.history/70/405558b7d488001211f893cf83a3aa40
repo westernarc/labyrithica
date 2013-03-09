@@ -1,0 +1,7 @@
+package com.westernarc.labyrithica;
+
+public class Player {
+	public int STR;
+	public int SPD;
+	public int INT;
+}

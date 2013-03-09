@@ -1,0 +1,24 @@
+package com.westernarc.labyrithica;
+
+public class Player extends Entity {
+	//Stats: Strength, Speed, Intelligence
+	//Reduces chance to dodge
+	//Increases physical damage, maximum HP, HP regen
+	//Ability to hold weapons
+	public int VIT;
+	//Increases turn order, chance to dodge/block
+	//Ability to equip armor
+	public int SPD;
+	//Gives higher cast success chance, ability regen,
+	//ability effectiveness, maximum AP
+	//Ability to learn abilities
+	public int WIS;
+	
+	//x and y coordinates of sprite
+	public int x;
+	public int y;
+	
+	public boolean move(int x, int y) {
+		
+	}
+}

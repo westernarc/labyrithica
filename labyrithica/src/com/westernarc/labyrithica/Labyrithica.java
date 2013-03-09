@@ -5,10 +5,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Labyrithica implements ApplicationListener {
 	private OrthographicCamera camera;
@@ -32,6 +30,9 @@ public class Labyrithica implements ApplicationListener {
 	enum FLOORTILE {Wall, Floor}
 	FLOORTILE[][] varFloorTiles;
 	
+	//Player object
+	Player player;
+	
 	@Override
 	public void create() {		
 		float w = Gdx.graphics.getWidth();
@@ -47,6 +48,8 @@ public class Labyrithica implements ApplicationListener {
 		
 		varFloorTiles = new FLOORTILE[CONST_LABYRINTH_WIDTH][CONST_LABYRINTH_HEIGHT];
 		createNewFloor();
+		
+		player = new Player();
 	}
 
 	@Override
@@ -62,7 +65,13 @@ public class Labyrithica implements ApplicationListener {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 
+		handleInput();
+		
+		update();
+		
 		drawFloor();
+		
+		drawPlayer();
 		
 		batch.end();
 	}
@@ -88,6 +97,9 @@ public class Labyrithica implements ApplicationListener {
 		}
 	}
 	
+	private void drawPlayer() {
+		player.sprite.draw(batch);
+	}
 	//Reinitialize the floor array with a new floor
 	private void createNewFloor() {
 		for(int i = 0; i < CONST_LABYRINTH_WIDTH; i++) {
@@ -99,6 +111,19 @@ public class Labyrithica implements ApplicationListener {
 				}
 			}
 		}
+	}
+	
+	private void handleInput() {
+		if(Gdx.input.isTouched()) {
+			int x = Gdx.input.getX();
+			int y = Gdx.input.getY();
+			System.out.println(x + "," + y);
+			player.move(100, 100);
+		}
+	}
+	
+	private void update() {
+		player.update();
 	}
 	@Override
 	public void resize(int width, int height) {

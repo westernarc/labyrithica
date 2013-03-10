@@ -1,0 +1,68 @@
+package com.westernarc.labyrithica;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+
+public class Enemy extends Entity {
+	public float x;
+	public float y;
+	
+	public float targetX;
+	public float targetY;
+
+	//Hold reference to player
+	Player player;
+	
+	public Sprite sprite;
+	
+	//Stats: Strength, Speed, Intelligence
+	//Reduces chance to dodge
+	//Increases physical damage, maximum HP, HP regen
+	//Ability to hold weapons
+	public int VIT;
+	//Increases turn order, chance to dodge/block
+	//Ability to equip armor
+	public int SPD;
+	//Gives higher cast success chance, ability regen,
+	//ability effectiveness, maximum AP
+	//Ability to learn abilities
+	public int WIS;
+	
+	public void moveTo(float tX, float tY) {
+		if(ready) {
+			targetX = Math.round(tX + x);
+			targetY = Math.round(tY + y);
+			ready = false;
+		}
+	}
+	public void move(float x, float y) {
+		if(this.x > x) this.x -= 0.1f; else if(this.x < x) this.x += 0.1f;
+		if(this.y > y) this.y -= 0.1f; else if(this.y < y) this.y += 0.1f;
+		if(Math.abs(this.x - targetX) <= 0.1f) {
+			this.x = targetX;
+		}
+		if(Math.abs(this.y - targetY) <= 0.1f) {
+			this.y = targetY;
+		}
+		if(this.y == targetY && this.x == targetX) ready = true;
+	}
+	
+	public Enemy(TYPE type, Player player) {
+		super("enemy_" + type);
+		switch(type) {
+			default:
+				sprite = new Sprite(new Texture(Gdx.files.internal("img/enemy.png")));
+		}
+		sprite = new Sprite(new Texture(Gdx.files.internal("img/enemy.png")));
+		this.player = player;
+	}
+	
+	public enum TYPE {Ant, Bee, Newt, Wolf, Direwolf, Bandit, Warrior, Centaur, Minotaur, Goliath, Devil}
+	TYPE type;
+	
+	@Override
+	public void update() {
+		
+	}
+}

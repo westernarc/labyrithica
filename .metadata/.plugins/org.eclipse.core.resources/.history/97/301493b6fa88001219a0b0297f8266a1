@@ -1,0 +1,8 @@
+package com.westernarc.labyrithica;
+
+public class Enemy extends Entity{
+	enum TYPE {Ant, Bee, Newt, Wolf, Direwolf, Bandit, Warrior, Centaur, Minotaur, Goliath, Devil}
+	TYPE type;
+	
+	
+}

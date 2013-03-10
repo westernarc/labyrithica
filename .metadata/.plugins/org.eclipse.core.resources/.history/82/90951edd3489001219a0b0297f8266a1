@@ -1,0 +1,82 @@
+package com.westernarc.labyrithica;
+
+import com.badlogic.gdx.graphics.g2d.Sprite;
+
+public class Entity {
+	public String name;
+	//The entity's turn is over
+	public boolean ready;
+	public float x, y;
+	public float targetX, targetY;
+	
+	public Sprite sprite;
+	
+	public boolean moving;
+	
+	//Hold reference to game
+	Labyrithica game;
+	
+	//Is in the line of sight of the player
+	public boolean inSight;
+	
+	public Entity(String name, Labyrithica game) {
+		this.name = name;
+		this.game = game;
+		
+		ready = true;
+		moving = false;
+		
+		inSight = false;
+	}
+	
+	public void update() {
+		if(moving) move(targetX, targetY);
+		
+		//Calculate line of sight
+		//Draw a line from each of the tiles to the player.
+		//If there is a block on the line, make the tile not visible
+		inSight = false;
+		//For each tile
+		for(int x = 0; x < game.CONST_LABYRINTH_WIDTH; x++) {
+			for(int y = 0; y < game.CONST_LABYRINTH_HEIGHT; y++) {
+				//Draw a line to the player from each tile
+				//Go down it in 0.5f increments
+				
+			}
+		}
+	}
+	
+	public void moveTo(float tX, float tY) {
+		if(ready) {
+			targetX = Math.round(tX + x);
+			targetY = Math.round(tY + y);
+			ready = false;
+			moving = true;
+		}
+	}
+	public void move(float x, float y) {
+		if(this.x > x) this.x -= 0.1f; else if(this.x < x) this.x += 0.1f;
+		if(this.y > y) this.y -= 0.1f; else if(this.y < y) this.y += 0.1f;
+		if(Math.abs(this.x - targetX) <= 0.1f) {
+			this.x = targetX;
+		}
+		if(Math.abs(this.y - targetY) <= 0.1f) {
+			this.y = targetY;
+		}
+		if(this.x == targetX && this.y == targetY) {
+			moving = false;
+		}
+	}
+	public int getFloorX() {
+		return (int)Math.floor(x);
+	}
+	public int getFloorY() {
+		return (int)Math.floor(y);
+	}
+	public int getCeilX() {
+		return (int)Math.ceil(x);
+	}
+	public int getCeilY() {
+		return (int)Math.ceil(y);
+	}
+}

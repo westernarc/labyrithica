@@ -8,8 +8,8 @@ public class Main {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "labyrithica";
 		cfg.useGL20 = false;
-		cfg.width = 240;
-		cfg.height = 400;
+		cfg.width = 480;
+		cfg.height = 800;
 		
 		new LwjglApplication(new Labyrithica(), cfg);
 	}

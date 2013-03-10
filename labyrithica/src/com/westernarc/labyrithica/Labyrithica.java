@@ -1,7 +1,11 @@
 package com.westernarc.labyrithica;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -31,12 +35,17 @@ public class Labyrithica implements ApplicationListener {
 	
 	//Labyrinth floor tiles.  2D Array that will store
 	//which type of tile goes where on the map.
-	enum FLOORTILE {Wall, Floor}
-	FLOORTILE[][] varFloorTiles;
+	Tile[][] varFloorTiles;
+	Tile WALLTILE = new Tile(Tile.TYPE.Wall, this);
 	
+	ArrayList<Enemy> enemies;
 	//Player object
 	Player player;
 	
+	//Boolean that holds whos turn it is; the player's or the enemy's
+	boolean varPlayerPhase;
+	//Boolean that holds whether or not menu  mode is active
+	//When the center of the screen is pressed, 
 	@Override
 	public void create() {		
 		SCREEN_WIDTH = Gdx.graphics.getWidth();
@@ -50,10 +59,16 @@ public class Labyrithica implements ApplicationListener {
 		sprArrFloorTiles[1] = new Sprite(new Texture(Gdx.files.internal("img/floor.png")));
 		sprArrFloorTiles[2] = new Sprite(new Texture(Gdx.files.internal("img/stairs.png")));
 		
-		varFloorTiles = new FLOORTILE[CONST_LABYRINTH_WIDTH][CONST_LABYRINTH_HEIGHT];
+		varFloorTiles = new Tile[CONST_LABYRINTH_WIDTH][CONST_LABYRINTH_HEIGHT];
+		
+		
+		player = new Player(this);
+		
+		enemies = new ArrayList<Enemy>();
+		
 		createNewFloor();
 		
-		player = new Player();
+		varPlayerPhase = true;
 	}
 
 	@Override
@@ -77,26 +92,30 @@ public class Labyrithica implements ApplicationListener {
 		
 		drawPlayer();
 		
+		drawEnemy();
+		
 		batch.end();
 	}
 
 	//Draw floor tiles. Requires batch to be started
 	private void drawFloor() {
-		for(int i = 0; i < CONST_LABYRINTH_WIDTH; i++) {
-			for(int ii = 0; ii < CONST_LABYRINTH_HEIGHT; ii++) {
+		for(int x = 0; x < CONST_LABYRINTH_WIDTH; x++) {
+			for(int y = 0; y < CONST_LABYRINTH_HEIGHT; y++) {
 				//Draw each tile according to the type of floortype they are
-				switch(varFloorTiles[i][ii]){
+				switch(varFloorTiles[x][y].type){
 				case Floor:
-					sprArrFloorTiles[1].setPosition(i * CONST_TILE_WIDTH, ii * CONST_TILE_HEIGHT);
-					sprArrFloorTiles[1].draw(batch);	
+					sprArrFloorTiles[1].setPosition(varFloorTiles[x][y].x * CONST_TILE_WIDTH, varFloorTiles[x][y].y * CONST_TILE_HEIGHT);
+					sprArrFloorTiles[1].draw(batch, varFloorTiles[x][y].inSight ? 1 : 0.2f);	
 					break;
 				case Wall:
-					sprArrFloorTiles[0].setPosition(i * CONST_TILE_WIDTH, ii * CONST_TILE_HEIGHT);
-					sprArrFloorTiles[0].draw(batch);
+					sprArrFloorTiles[0].setPosition(varFloorTiles[x][y].x * CONST_TILE_WIDTH, varFloorTiles[x][y].y * CONST_TILE_HEIGHT);
+					sprArrFloorTiles[0].draw(batch, varFloorTiles[x][y].inSight ? 1 : 0.2f);
 					break;
+				case Stairs:
+					sprArrFloorTiles[2].setPosition(varFloorTiles[x][y].x * CONST_TILE_WIDTH, varFloorTiles[x][y].y * CONST_TILE_HEIGHT);
+					sprArrFloorTiles[2].draw(batch, varFloorTiles[x][y].inSight ? 1 : 0.2f);
 				default:
 					break;
-				
 				}
 			}
 		}
@@ -108,20 +127,66 @@ public class Labyrithica implements ApplicationListener {
 		player.sprite.setPosition(player.x * CONST_TILE_WIDTH, player.y * CONST_TILE_HEIGHT);
 		player.sprite.draw(batch);
 	}
+	
+	private void drawEnemy() {
+		Iterator<Enemy> enemyItr = enemies.iterator();
+		while(enemyItr.hasNext()) {
+			Enemy currentEnemy = enemyItr.next();
+			currentEnemy.sprite.setPosition(currentEnemy.x * CONST_TILE_WIDTH, currentEnemy.y * CONST_TILE_HEIGHT);
+			currentEnemy.sprite.draw(batch);
+		}
+	}
 	//Reinitialize the floor array with a new floor
 	private void createNewFloor() {
-		for(int i = 0; i < CONST_LABYRINTH_WIDTH; i++) {
-			for(int ii = 0; ii < CONST_LABYRINTH_HEIGHT; ii++) {
+		for(int x = 0; x < CONST_LABYRINTH_WIDTH; x++) {
+			for(int y = 0; y < CONST_LABYRINTH_HEIGHT; y++) {
 				if(Math.random() > 0.8) {
-					varFloorTiles[i][ii] = FLOORTILE.Wall;
+					varFloorTiles[x][y] = new Tile(Tile.TYPE.Wall, this);
 				} else {
-					varFloorTiles[i][ii] = FLOORTILE.Floor;
+					varFloorTiles[x][y] = new Tile(Tile.TYPE.Floor, this);
 				}
+				varFloorTiles[x][y].x = x;
+				varFloorTiles[x][y].y = y;
+			}
+		}
+		
+		//Place stairs randomly
+		int randomX = (int)(Math.random() * CONST_LABYRINTH_HEIGHT);
+		int randomY = (int)(Math.random() * CONST_LABYRINTH_WIDTH);
+		varFloorTiles[randomX][randomY].type = Tile.TYPE.Stairs;
+		System.out.println("Stairs: " + randomX + " , " + randomY);
+		
+		//Place monsters
+		Enemy newEnemy = new Enemy(Enemy.TYPE.Ant, this);
+		newEnemy.x = 5;
+		newEnemy.y = 5;
+		newEnemy.targetX = 5;
+		newEnemy.targetY = 5;
+		Enemy newEnemy2 = new Enemy(Enemy.TYPE.Ant, this);
+		newEnemy2.x = 7;
+		newEnemy2.y = 7;
+		newEnemy2.targetX = 7;
+		newEnemy2.targetY = 7;
+		enemies.add(newEnemy);
+		enemies.add(newEnemy2);
+		
+		//Update floor tiles
+		for(int x = 0; x < CONST_LABYRINTH_WIDTH; x++) {
+			for(int y = 0; y < CONST_LABYRINTH_HEIGHT; y++) {
+				varFloorTiles[x][y].update();
 			}
 		}
 	}
 	
 	private void handleInput() {
+		if(Gdx.input.isKeyPressed(Keys.A)) {
+			varPlayerPhase = false;
+		}
+		if(Gdx.input.isKeyPressed(Keys.S)) {
+			varPlayerPhase = true;
+			player.ready = true;
+			
+		}
 		if(Gdx.input.isTouched()) {
 			int x = Gdx.input.getX();
 			int y = Gdx.input.getY();
@@ -150,30 +215,30 @@ public class Labyrithica implements ApplicationListener {
 				else if(x > SCREEN_WIDTH * 2f / 3f) pos = 6;
 				else pos = 5;
 			}
-			System.out.println(pos);
+
 			switch(pos) {
 			case 1: //NW
 				break;
 			case 2: //N
-				if(player.getFloorY() < CONST_LABYRINTH_HEIGHT - 1 && varFloorTiles[player.getFloorX()][player.getCeilY() + 1] == FLOORTILE.Floor)
+				if(player.getCeilY() < CONST_LABYRINTH_HEIGHT - 1 && varFloorTiles[player.getFloorX()][player.getCeilY() + 1].type != Tile.TYPE.Wall)
 				player.moveTo(0, 0.7f);
 				break;
 			case 3: //NE
 				break;
 			case 4: //W
-				if(player.getFloorX() > 0 && varFloorTiles[player.getFloorX() - 1][player.getFloorY()] == FLOORTILE.Floor)
+				if(player.getFloorX() > 0 && varFloorTiles[player.getFloorX() - 1][player.getFloorY()].type != Tile.TYPE.Wall)
 				player.moveTo(-0.7f, 0);
 				break;
 			case 5: //C
 				break;
 			case 6: //E
-				if(player.getFloorX() < CONST_LABYRINTH_WIDTH - 1 && varFloorTiles[player.getCeilX() + 1][player.getFloorY()] == FLOORTILE.Floor)
+				if(player.getCeilX() < CONST_LABYRINTH_WIDTH - 1 && varFloorTiles[player.getCeilX() + 1][player.getFloorY()].type != Tile.TYPE.Wall)
 				player.moveTo(0.7f, 0);
 				break;
 			case 7: //SW
 				break;
 			case 8: //S
-				if(player.getFloorY() > 0 && varFloorTiles[player.getFloorX()][player.getFloorY() - 1] == FLOORTILE.Floor)
+				if(player.getFloorY() > 0 && varFloorTiles[player.getFloorX()][player.getFloorY() - 1].type != Tile.TYPE.Wall)
 				player.moveTo(0, -0.7f);
 				break;
 			case 9: //SE
@@ -184,13 +249,45 @@ public class Labyrithica implements ApplicationListener {
 	}
 	
 	private void update() {
-		//Update the player
-		player.update();
+		if(varPlayerPhase) {
+			//Update the player
+			player.update();
+			if(!player.moving && !player.ready) {
+				varPlayerPhase = false;
+				Iterator<Enemy> enemyItr = enemies.iterator();
+				while(enemyItr.hasNext()) {
+					Enemy currentEnemy = enemyItr.next();
+					currentEnemy.ready = true;
+				}
+				//Update floor tiles
+				for(int x = 0; x < CONST_LABYRINTH_WIDTH; x++) {
+					for(int y = 0; y < CONST_LABYRINTH_HEIGHT; y++) {
+						varFloorTiles[x][y].update();
+					}
+				}
+			}
+		} else {
+			boolean allEnemiesDone = true;
+			//Update enemies
+			Iterator<Enemy> enemyItr = enemies.iterator();
+			while(enemyItr.hasNext()) {
+				Enemy currentEnemy = enemyItr.next();
+				currentEnemy.sprite.setPosition(currentEnemy.x * CONST_TILE_WIDTH, currentEnemy.y * CONST_TILE_HEIGHT);
+				currentEnemy.update();
+				if(currentEnemy.ready || currentEnemy.moving) allEnemiesDone = false;
+			}
+			if(allEnemiesDone) {
+				varPlayerPhase = true;
+				player.ready = true;
+			}
+		}
+		
+		
+
 		
 		//Move the camera to be in position
 		camera.position.set((int)player.sprite.getX(), (int)player.sprite.getY(), 0);
 		camera.update(true);
-		
 		
 	}
 	@Override
@@ -204,4 +301,13 @@ public class Labyrithica implements ApplicationListener {
 	@Override
 	public void resume() {
 	}
+	
+	public Tile getTile(int x, int y) {
+		try {
+			return varFloorTiles[x][y];
+		}catch(Exception e) {
+			return WALLTILE;
+		}
+	}
+	
 }

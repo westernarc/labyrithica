@@ -1,0 +1,41 @@
+package com.westernarc.labyrithica;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+
+public class Enemy extends Entity {
+	//Hold reference to player
+	Player player;
+	
+	Sprite sprite;
+	
+	//Stats: Strength, Speed, Intelligence
+	//Reduces chance to dodge
+	//Increases physical damage, maximum HP, HP regen
+	//Ability to hold weapons
+	public int VIT;
+	//Increases turn order, chance to dodge/block
+	//Ability to equip armor
+	public int SPD;
+	//Gives higher cast success chance, ability regen,
+	//ability effectiveness, maximum AP
+	//Ability to learn abilities
+	public int WIS;
+	
+	public Enemy(TYPE type) {
+		super("enemy_" + type);
+		switch(type) {
+			default:
+				sprite = new Sprite(new Texture(Gdx.files.internal("img/enemy.png")));
+		}
+	}
+	
+	enum TYPE {Ant, Bee, Newt, Wolf, Direwolf, Bandit, Warrior, Centaur, Minotaur, Goliath, Devil}
+	TYPE type;
+	
+	@Override
+	public void update() {
+		
+	}
+}

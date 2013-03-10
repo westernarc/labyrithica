@@ -1,0 +1,11 @@
+package com.westernarc.labyrithica;
+
+public class Tile extends Entity {
+	public Tile(Labyrithica game) {
+		super(name, game);
+		// TODO Auto-generated constructor stub
+	}
+
+	public enum TYPE {Wall, Floor, Stairs}
+	public TYPE type;
+}

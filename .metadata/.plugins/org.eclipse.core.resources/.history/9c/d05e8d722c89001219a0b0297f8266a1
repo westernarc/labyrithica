@@ -1,0 +1,5 @@
+package com.westernarc.labyrithica;
+
+public class Tile extends Entity {
+	public enum TYPE {Wall, Floor, Stairs}
+}

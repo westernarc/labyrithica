@@ -1,0 +1,12 @@
+package com.westernarc.labyrithica;
+
+public class Enemy extends Entity {
+	public Enemy(TYPE type) {
+		super("enemy_" + type);
+		// TODO Auto-generated constructor stub
+	}
+	enum TYPE {Ant, Bee, Newt, Wolf, Direwolf, Bandit, Warrior, Centaur, Minotaur, Goliath, Devil}
+	TYPE type;
+	
+	
+}

@@ -1,0 +1,34 @@
+package com.westernarc.labyrithica;
+
+public class Entity {
+	String name;
+	//The entity's turn is over
+	boolean ready;
+	
+	public Entity(String name) {
+		this.name = name;
+	}
+	
+	public void update() {
+		
+	}
+	
+	public void moveTo(float tX, float tY) {
+		if(ready) {
+			targetX = Math.round(tX + x);
+			targetY = Math.round(tY + y);
+			ready = false;
+		}
+	}
+	public void move(float x, float y) {
+		if(this.x > x) this.x -= 0.1f; else if(this.x < x) this.x += 0.1f;
+		if(this.y > y) this.y -= 0.1f; else if(this.y < y) this.y += 0.1f;
+		if(Math.abs(this.x - targetX) <= 0.1f) {
+			this.x = targetX;
+		}
+		if(Math.abs(this.y - targetY) <= 0.1f) {
+			this.y = targetY;
+		}
+	}
+	
+}

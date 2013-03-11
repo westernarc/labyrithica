@@ -1,0 +1,35 @@
+package com.westernarc.labyrithica;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+
+public class Player extends Entity {
+	Sprite[] frames;
+	
+	public Player(Labyrithica game) {
+		super("player", game);
+		sprite = new Sprite(new Texture(Gdx.files.internal("img/stand.png")));
+		frames = new Sprite[3];
+	}
+
+	//Stats: Strength, Speed, Intelligence
+	//Reduces chance to dodge
+	//Increases physical damage, maximum HP, HP regen
+	//Ability to hold weapons
+	public int VIT;
+	//Increases turn order, chance to dodge/block
+	//Ability to equip armor
+	public int SPD;
+	//Gives higher cast success chance, ability regen,
+	//ability effectiveness, maximum AP
+	//Ability to learn abilities
+	public int WIS;
+	
+	public Sprite sprite;
+	
+	@Override
+	public void update() {
+		super.update();
+	}
+
+}

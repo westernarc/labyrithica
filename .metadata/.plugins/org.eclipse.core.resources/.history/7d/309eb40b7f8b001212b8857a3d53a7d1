@@ -1,0 +1,130 @@
+package com.westernarc.labyrithica;
+
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
+
+public class Entity {
+	//Stats: Strength, Speed, Intelligence
+	//Reduces chance to dodge
+	//Increases physical damage, maximum HP, HP regen
+	//Ability to hold weapons
+	public int VIT;
+	//Increases turn order, chance to dodge/block
+	//Ability to equip armor
+	public int SPD;
+	//Gives higher cast success chance, ability regen,
+	//ability effectiveness, maximum AP
+	//Ability to learn abilities
+	public int WIS;
+	
+	public String name;
+	//The entity's turn is over
+	public boolean ready;
+	public float x, y;
+	public float targetX, targetY;
+	
+	public Sprite sprite;
+	
+	public boolean moving;
+	public boolean dead;
+	
+	public boolean returning;
+	
+	//Hold reference to game
+	Labyrithica game;
+	
+	//Is in the line of sight of the player
+	public boolean inSight;
+	public boolean discovered;
+	
+	public Entity(String name, Labyrithica game) {
+		this.name = name;
+		this.game = game;
+		
+		ready = true;
+		moving = false;
+		
+		inSight = false;
+		discovered = false;
+		dead = false;
+		
+		returning = false;
+	}
+	
+	public void update() {
+		if(moving) move(targetX, targetY);
+		
+		//Calculate line of sight
+		//Draw a line from each of the tiles to the player.
+		//If there is a block on the line, make the tile not visible
+		inSight = true;
+		//For each tile
+		float playerX = game.player.x;
+		float playerY = game.player.y;
+		
+		//Draw a line to the player from each tile
+		//Go down it in 0.5f increments
+		
+		float diffX = Math.abs(x - playerX);
+		float diffY = Math.abs(y - playerY);
+		
+		for(float len = 0; len <= 1; len += 0.01f) {
+			int segX = Math.round(playerX + diffX * len);
+			int segY = Math.round(playerY + diffY * len);
+			if(game.getTile(segX, segY).type == Tile.TYPE.Wall) inSight = false;
+		}
+		if(diffX <= 1 && diffY <= 1) {
+			inSight = true;
+		}
+		if(!discovered && inSight) {
+			discovered = true;
+		}
+	}
+	
+	public void moveTo(float tX, float tY) {
+		if(ready) {
+			targetX = Math.round(tX + x);
+			targetY = Math.round(tY + y);
+			ready = false;
+			moving = true;
+		}
+	}
+	public void moveAndReturn(float tX, float tY) {
+		if(ready) {
+			targetX = tX + x;
+			targetY = tY + y;
+			ready = false;
+			moving = true;
+			returning = true;
+		}
+	}
+	public void move(float x, float y) {
+		if(this.x > x) this.x -= 0.1f; else if(this.x < x) this.x += 0.1f;
+		if(this.y > y) this.y -= 0.1f; else if(this.y < y) this.y += 0.1f;
+		if(Math.abs(this.x - targetX) <= 0.1f) {
+			this.x = targetX;
+		}
+		if(Math.abs(this.y - targetY) <= 0.1f) {
+			this.y = targetY;
+		}
+		if(this.x == targetX && this.y == targetY) {
+			if(returning) {
+				
+			} else {
+				moving = false;
+			}
+		}
+	}
+	public int getFloorX() {
+		return (int)Math.floor(x);
+	}
+	public int getFloorY() {
+		return (int)Math.floor(y);
+	}
+	public int getCeilX() {
+		return (int)Math.ceil(x);
+	}
+	public int getCeilY() {
+		return (int)Math.ceil(y);
+	}
+}

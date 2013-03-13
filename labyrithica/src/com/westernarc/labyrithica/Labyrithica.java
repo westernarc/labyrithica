@@ -9,6 +9,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.westernarc.labyrithica.Tile.TYPE;
@@ -18,8 +19,32 @@ public class Labyrithica implements ApplicationListener {
 	private SpriteBatch batch;
 	
 	private Sprite[] sprArrFloorTiles;
+	final int CONST_TILE_WALLN = 0;
+	final int CONST_TILE_WALLW = 1;
+	final int CONST_TILE_WALLE = 2;
+	final int CONST_TILE_WALLS = 3;
+	
+	final int CONST_TILE_WALLNE = 4;
+	final int CONST_TILE_WALLES = 5;
+	final int CONST_TILE_WALLWS = 6;
+	final int CONST_TILE_WALLNW = 7;
+	final int CONST_TILE_WALLNS = 8;
+	final int CONST_TILE_WALLWE = 9;
+	
+	final int CONST_TILE_WALLNWE = 10;
+	final int CONST_TILE_WALLNES = 11;
+	final int CONST_TILE_WALLWES = 12;
+	final int CONST_TILE_WALLNWS = 13;
+	
+	final int CONST_TILE_WALLA = 14;
+	final int CONST_TILE_WALLC = 15;
+	
+	final int CONST_TILE_FLOOR = 16;
+	final int CONST_TILE_STAIRS = 17;
 	
 	private Sprite[] sprMenuIcons;
+	
+	BitmapFont uiFont;
 	
 	//Dimensions of screen
 	int SCREEN_WIDTH;
@@ -61,10 +86,29 @@ public class Labyrithica implements ApplicationListener {
 		camera = new OrthographicCamera(SCREEN_WIDTH, SCREEN_HEIGHT);
 		batch = new SpriteBatch();
 		
-		sprArrFloorTiles = new Sprite[16];
-		sprArrFloorTiles[0] = new Sprite(new Texture(Gdx.files.internal("img/wall.png")));
-		sprArrFloorTiles[1] = new Sprite(new Texture(Gdx.files.internal("img/floor.png")));
-		sprArrFloorTiles[2] = new Sprite(new Texture(Gdx.files.internal("img/stairs.png")));
+		sprArrFloorTiles = new Sprite[32];
+		sprArrFloorTiles[CONST_TILE_WALLN] = new Sprite(new Texture(Gdx.files.internal("img/wallN.png")));
+		sprArrFloorTiles[CONST_TILE_WALLW] = new Sprite(new Texture(Gdx.files.internal("img/wallW.png")));
+		sprArrFloorTiles[CONST_TILE_WALLE] = new Sprite(new Texture(Gdx.files.internal("img/wallE.png")));
+		sprArrFloorTiles[CONST_TILE_WALLS] = new Sprite(new Texture(Gdx.files.internal("img/wallS.png")));
+		
+		sprArrFloorTiles[CONST_TILE_WALLNE] = new Sprite(new Texture(Gdx.files.internal("img/wallNE.png")));
+		sprArrFloorTiles[CONST_TILE_WALLES] = new Sprite(new Texture(Gdx.files.internal("img/wallES.png")));
+		sprArrFloorTiles[CONST_TILE_WALLWS] = new Sprite(new Texture(Gdx.files.internal("img/wallWS.png")));
+		sprArrFloorTiles[CONST_TILE_WALLNW] = new Sprite(new Texture(Gdx.files.internal("img/wallNW.png")));
+		sprArrFloorTiles[CONST_TILE_WALLNS] = new Sprite(new Texture(Gdx.files.internal("img/wallNS.png")));
+		sprArrFloorTiles[CONST_TILE_WALLWE] = new Sprite(new Texture(Gdx.files.internal("img/wallWE.png")));
+		
+		sprArrFloorTiles[CONST_TILE_WALLNWE] = new Sprite(new Texture(Gdx.files.internal("img/wallNWE.png")));
+		sprArrFloorTiles[CONST_TILE_WALLNES] = new Sprite(new Texture(Gdx.files.internal("img/wallNES.png")));
+		sprArrFloorTiles[CONST_TILE_WALLWES] = new Sprite(new Texture(Gdx.files.internal("img/wallWES.png")));
+		sprArrFloorTiles[CONST_TILE_WALLNWS] = new Sprite(new Texture(Gdx.files.internal("img/wallNWS.png")));
+		
+		sprArrFloorTiles[CONST_TILE_WALLA] = new Sprite(new Texture(Gdx.files.internal("img/wallA.png")));
+		sprArrFloorTiles[CONST_TILE_WALLC] = new Sprite(new Texture(Gdx.files.internal("img/wallC.png")));
+		
+		sprArrFloorTiles[CONST_TILE_FLOOR] = new Sprite(new Texture(Gdx.files.internal("img/floor.png")));
+		sprArrFloorTiles[CONST_TILE_STAIRS] = new Sprite(new Texture(Gdx.files.internal("img/stairs.png")));
 		
 		//Menu layout is like this:
 		//1 2 3
@@ -87,6 +131,9 @@ public class Labyrithica implements ApplicationListener {
 		
 		varPlayerPhase = true;
 		varMenuActive = false;
+		
+		//Initialize the font
+		uiFont = new BitmapFont();
 	}
 
 	@Override
@@ -112,10 +159,19 @@ public class Labyrithica implements ApplicationListener {
 		
 		drawPlayer();
 		
+		uiFont.draw(batch, "Labyrinth Floor " + (varCurrentLabyrinthFloor + 1), 10 + camera.position.x  - SCREEN_WIDTH / 2, camera.position.y + SCREEN_HEIGHT / 2 - uiFont.getLineHeight());
+		uiFont.draw(batch, "VIT " + player.VIT, 10 + camera.position.x  - SCREEN_WIDTH / 2, camera.position.y + SCREEN_HEIGHT / 2 - uiFont.getLineHeight() * 2);
+		uiFont.draw(batch, "SPD " + player.SPD, 10 + camera.position.x  - SCREEN_WIDTH / 2, camera.position.y + SCREEN_HEIGHT / 2 - uiFont.getLineHeight() * 3);
+		uiFont.draw(batch, "WIS " + player.WIS, 10 + camera.position.x  - SCREEN_WIDTH / 2, camera.position.y + SCREEN_HEIGHT / 2 - uiFont.getLineHeight() * 4);
+		
 		if(varMenuActive) {
 			drawMenu();
 		}
 		batch.end();
+		
+		//Move the camera to be in position
+		camera.position.set((int)player.sprite.getX(), (int)player.sprite.getY(), 0);
+		camera.update(true);
 	}
 
 	//Draw floor tiles. Requires batch to be started
@@ -123,24 +179,9 @@ public class Labyrithica implements ApplicationListener {
 		for(int x = 0; x < CONST_LABYRINTH_WIDTH; x++) {
 			for(int y = 0; y < CONST_LABYRINTH_HEIGHT; y++) {
 				//Draw each tile according to the type of floortype they are
-				switch(varFloorTiles[x][y].type){
-				case Floor:
-					sprArrFloorTiles[1].setPosition(varFloorTiles[x][y].x * CONST_TILE_WIDTH, varFloorTiles[x][y].y * CONST_TILE_HEIGHT);
-					if(varFloorTiles[x][y].discovered)
-						sprArrFloorTiles[1].draw(batch, varFloorTiles[x][y].inSight ? 1 : 0.4f);	
-					break;
-				case Wall:
-					sprArrFloorTiles[0].setPosition(varFloorTiles[x][y].x * CONST_TILE_WIDTH, varFloorTiles[x][y].y * CONST_TILE_HEIGHT);
-					if(varFloorTiles[x][y].discovered)
-						sprArrFloorTiles[0].draw(batch, varFloorTiles[x][y].inSight ? 1 : 0.4f);
-					break;
-				case Stairs:
-					sprArrFloorTiles[2].setPosition(varFloorTiles[x][y].x * CONST_TILE_WIDTH, varFloorTiles[x][y].y * CONST_TILE_HEIGHT);
-					if(varFloorTiles[x][y].discovered)
-						sprArrFloorTiles[2].draw(batch, varFloorTiles[x][y].inSight ? 1 : 0.4f);
-				default:
-					break;
-				}
+				varFloorTiles[x][y].sprite.setPosition(varFloorTiles[x][y].x * CONST_TILE_WIDTH, varFloorTiles[x][y].y * CONST_TILE_HEIGHT);
+				if(varFloorTiles[x][y].discovered)
+					varFloorTiles[x][y].sprite.draw(batch, varFloorTiles[x][y].inSight ? 1 : 0.4f);
 			}
 		}
 	}
@@ -185,10 +226,114 @@ public class Labyrithica implements ApplicationListener {
 			}
 		}
 		
+		//Set up floor sprites
+		for(int x = 0; x < CONST_LABYRINTH_WIDTH; x++) {
+			for(int y = 0; y < CONST_LABYRINTH_HEIGHT; y++) {
+				if(varFloorTiles[x][y].type == TYPE.Wall) {
+					//Change wall tile depending on how many wall tiles it is touching
+					boolean n = false;
+					boolean w = false;
+					boolean e = false;
+					boolean s = false;
+					if(x == CONST_LABYRINTH_WIDTH - 1 || varFloorTiles[x + 1][y].type == TYPE.Wall) e = true;
+					if(x == 0 || varFloorTiles[x - 1][y].type == TYPE.Wall) w = true;
+					if(y == CONST_LABYRINTH_HEIGHT - 1 || varFloorTiles[x][y + 1].type == TYPE.Wall) n = true;
+					if(y == 0 || varFloorTiles[x][y - 1].type == TYPE.Wall) s = true;
+					
+					if(n) {
+						if(w) {
+							if(e) {
+								if(s) {
+									//NWES
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLC];
+								} else {
+									//NWE
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLNWE];
+								}
+							} else {
+								if(s) {
+									//NWS
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLNWS];
+								} else {
+									//NW
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLNW];
+								}
+							}
+						} else {
+							if(e) {
+								if(s) {
+									//NES
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLNES];
+								} else {
+									//NE
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLNE];
+								}
+							} else {
+								if(s) {
+									//NS
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLNS];
+								} else {
+									//N
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLN];
+								}
+							}
+						}
+					} else {
+						if(w) {
+							if(e) {
+								if(s) {
+									//WES
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLWES];
+								} else {
+									//WE
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLWE];
+								}
+							} else {
+								if(s) {
+									//WS
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLWS];
+								} else {
+									//W
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLW];
+								}
+							}
+						} else {
+							if(e) {
+								if(s) {
+									//ES
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLES];
+								} else {
+									//E
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLE];
+								}
+							} else {
+								if(s) {
+									//S
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLS];
+								} else {
+									varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLA];
+								}
+							}
+						}
+					}
+					if(varFloorTiles[x][y].sprite == null)
+						varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_WALLC];
+					
+				} else if(varFloorTiles[x][y].type == TYPE.Floor) {
+					varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_FLOOR];
+				} else if(varFloorTiles[x][y].type == TYPE.Stairs) {
+					varFloorTiles[x][y].sprite = sprArrFloorTiles[CONST_TILE_STAIRS];
+				}
+				varFloorTiles[x][y].x = x;
+				varFloorTiles[x][y].y = y;
+			}
+		}
+		
 		//Place stairs randomly
 		int randomX = (int)(Math.random() * CONST_LABYRINTH_HEIGHT);
 		int randomY = (int)(Math.random() * CONST_LABYRINTH_WIDTH);
 		varFloorTiles[randomX][randomY].type = Tile.TYPE.Stairs;
+		varFloorTiles[randomX][randomY].sprite = sprArrFloorTiles[CONST_TILE_STAIRS];
 		System.out.println("Stairs: " + randomX + " , " + randomY);
 		
 		enemies.clear();
@@ -224,7 +369,7 @@ public class Labyrithica implements ApplicationListener {
 			player.ready = true;
 			
 		}
-		if(Gdx.input.isTouched()) {
+		if(Gdx.input.justTouched()) {
 			int x = Gdx.input.getX();
 			int y = Gdx.input.getY();
 			//Split the screen into 9 squares.
@@ -306,9 +451,7 @@ public class Labyrithica implements ApplicationListener {
 					break;
 				case 5: //C
 					//Toggle menu view
-					if(Gdx.input.justTouched()) {
-						varMenuActive = !varMenuActive;
-					}
+					varMenuActive = !varMenuActive;
 					break;
 				case 6: //E
 					if(player.getCeilX() < CONST_LABYRINTH_WIDTH - 1 && varFloorTiles[player.getCeilX() + 1][player.getFloorY()].type != Tile.TYPE.Wall)
@@ -331,7 +474,8 @@ public class Labyrithica implements ApplicationListener {
 				Enemy currentEnemy = enemyItr.next();
 				if(currentEnemy.x == Math.floor(player.targetX) && currentEnemy.y == Math.floor(player.targetY) && !currentEnemy.dead) {
 					player.ready = true;
-					player.moveTo(0, 0);
+					player.moveAndReturn((currentEnemy.x - player.x)/2, (currentEnemy.y - player.y)/2);
+
 					System.out.println("You attacked the " + currentEnemy.type + " for 5 damage.");
 					currentEnemy.VIT -= 5;
 					if(currentEnemy.VIT <= 0) {
@@ -377,12 +521,7 @@ public class Labyrithica implements ApplicationListener {
 				varPlayerPhase = true;
 				player.ready = true;
 			}
-		}
-
-		//Move the camera to be in position
-		camera.position.set((int)player.sprite.getX(), (int)player.sprite.getY(), 0);
-		camera.update(true);
-		
+		}		
 	}
 	@Override
 	public void resize(int width, int height) {

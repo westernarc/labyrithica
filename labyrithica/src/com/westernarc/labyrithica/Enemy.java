@@ -59,7 +59,7 @@ public class Enemy extends Entity {
 			//If it moves into the player it attacks
 			if(targetX == Math.floor(game.player.x) && targetY == Math.floor(game.player.y)) {
 				ready = true;
-				moveTo(0,0);
+				moveAndReturn((game.player.x - x)/2, (game.player.y - y)/2);
 				System.out.println("Enemy attack");
 			}
 			//If it moves into an enemy don't move

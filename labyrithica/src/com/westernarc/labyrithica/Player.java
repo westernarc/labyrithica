@@ -5,8 +5,11 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class Player extends Entity {
 	Texture[] frames;
-	private int currentFrame;
-	private float frameTime;
+	
+	//Which foot to use during stepping
+	private boolean stepSide;
+	final boolean STEP_LEFT = false;
+	final boolean STEP_RIGHT = true;
 	
 	public Player(Labyrithica game) {
 		super("player", game);
@@ -15,13 +18,13 @@ public class Player extends Entity {
 		frames[1] = (new Texture(Gdx.files.internal("img/run2.png")));
 		frames[2] = (new Texture(Gdx.files.internal("img/run3.png")));
 		frames[3] = (new Texture(Gdx.files.internal("img/run4.png")));
-		currentFrame = 0;
-		frameTime = 0;
-		sprite = new Sprite(frames[currentFrame]);
+		sprite = new Sprite(frames[0]);
 		
 		VIT = 10;
 		SPD = 10;
 		WIS = 10;
+		
+		stepSide = STEP_RIGHT;
 	}
 
 	public Sprite sprite;
@@ -31,12 +34,16 @@ public class Player extends Entity {
 		super.update();
 	}
 	public void updateAnim(float tpf) {
-		frameTime += tpf;
-		if(frameTime > 0.3f) {
-			frameTime = 0;
-			currentFrame++;
-			if(currentFrame > 3) currentFrame = 0;
+		if(moving) {
+			if(stepSide)
+				sprite.setTexture(frames[1]);
+			else
+				sprite.setTexture(frames[3]);
+		} else {
+			if(!sprite.getTexture().equals(frames[0])) {
+				sprite.setTexture(frames[0]);
+				stepSide = !stepSide;
+			}
 		}
-		sprite.setTexture(frames[currentFrame]);
 	}
 }

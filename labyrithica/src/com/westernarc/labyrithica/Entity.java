@@ -27,6 +27,11 @@ public class Entity {
 	
 	public boolean moving;
 	public boolean dead;
+	
+	public boolean returning;
+	private float returnX;
+	private float returnY;
+	
 	//Hold reference to game
 	Labyrithica game;
 	
@@ -44,6 +49,10 @@ public class Entity {
 		inSight = false;
 		discovered = false;
 		dead = false;
+		
+		returning = false;
+		returnX = 0;
+		returnY = 0;
 	}
 	
 	public void update() {
@@ -84,6 +93,17 @@ public class Entity {
 			moving = true;
 		}
 	}
+	public void moveAndReturn(float tX, float tY) {
+		if(ready) {
+			targetX = tX + x;
+			targetY = tY + y;
+			returnX = -tX;
+			returnY = -tY;
+			ready = false;
+			moving = true;
+			returning = true;
+		}
+	}
 	public void move(float x, float y) {
 		if(this.x > x) this.x -= 0.1f; else if(this.x < x) this.x += 0.1f;
 		if(this.y > y) this.y -= 0.1f; else if(this.y < y) this.y += 0.1f;
@@ -94,7 +114,13 @@ public class Entity {
 			this.y = targetY;
 		}
 		if(this.x == targetX && this.y == targetY) {
-			moving = false;
+			if(returning) {
+				ready = true;
+				moveTo(returnX, returnY);
+				returning = false;
+			} else {
+				moving = false;
+			}
 		}
 	}
 	public int getFloorX() {
